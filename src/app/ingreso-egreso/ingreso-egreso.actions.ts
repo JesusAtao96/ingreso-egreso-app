@@ -1,4 +1,4 @@
-import { Action } from "@ngrx/store";
+import { Action } from '@ngrx/store';
 import { IngresoEgreso } from './ingreso-egreso.model';
 
 export const SET_ITEMS = '[Ingreso Egreso] Set Items';
