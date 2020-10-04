@@ -1,39 +1,28 @@
-import * as fromIngresoEgreso from './ingreso-egreso.actions';
-import { IngresoEgreso } from './ingreso-egreso.model';
-
+import { createReducer, on } from '@ngrx/store';
+import { setItems, unSetItems } from './ingreso-egreso.actions';
+import { IngresoEgreso } from '../models/ingreso-egreso.model';
 import { AppState } from '../app.reducer';
 
-export interface IngresoEgresoState {
-    items: IngresoEgreso[];
+export interface State {
+    items: IngresoEgreso[]; 
 }
 
-export interface AppState extends AppState {
-    ingresoEgreso: IngresoEgresoState;
+export interface AppStateWithIngreso extends AppState{
+    ingresosEgresos: State
 }
 
-const estadoInicial: IngresoEgresoState = {
-    items: []
-};
 
-export function ingresoEgresoReducer( state = estadoInicial, action: fromIngresoEgreso.acciones ): IngresoEgresoState {
-    switch (action.type) {
-        case fromIngresoEgreso.SET_ITEMS:
-            return {
-                items: [
-                    ...action.items.map( item => {
-                        return {
-                            ...item
-                        }
-                    })
-                ]
-            };
+export const initialState: State = {
+   items: [],
+}
 
-        case fromIngresoEgreso.UNSET_ITEMS:
-            return {
-                items: []
-            };
+const _ingresoEgresoReducer = createReducer(initialState,
 
-        default:
-            return state;
-    }
+    on( setItems,   (state, { items }) => ({ ...state, items: [...items]  })),
+    on( unSetItems, state => ({ ...state, items: []  })),
+
+);
+
+export function ingresoEgresoReducer(state, action) {
+    return _ingresoEgresoReducer(state, action);
 }

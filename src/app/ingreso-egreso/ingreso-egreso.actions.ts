@@ -1,17 +1,11 @@
-import { Action } from '@ngrx/store';
-import { IngresoEgreso } from './ingreso-egreso.model';
+import { createAction, props } from '@ngrx/store';
+import { IngresoEgreso } from '../models/ingreso-egreso.model';
 
-export const SET_ITEMS = '[Ingreso Egreso] Set Items';
-export const UNSET_ITEMS = '[Ingreso Egreso] Unset Items';
+export const unSetItems = createAction('[IngresoEgreso] Unset Items');
 
-export class SetItemsAction implements Action {
-    readonly type = SET_ITEMS;
+export const setItems = createAction(
+    '[IngresoEgreso] Set Items',
+    props<{ items: IngresoEgreso[] }>()
+);
 
-    constructor( public items: IngresoEgreso[] ) { }
-}
 
-export class UnsetItemsAction implements Action {
-    readonly type = UNSET_ITEMS;
-}
-
-export type acciones = SetItemsAction | UnsetItemsAction;

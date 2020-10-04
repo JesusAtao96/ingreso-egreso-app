@@ -1,25 +1,22 @@
-import * as fromAuth from './auth.actions';
-import { User } from './user.model';
+import { createReducer, on } from '@ngrx/store';
+import { setUser, unSetUser } from './auth.actions';
+import { Usuario } from '../models/usuario.model';
 
-export interface AuthState {
-    user: User;
-};
+export interface State {
+    user: Usuario; 
+}
 
-const initState: AuthState = {
-    user: null
-};
+export const initialState: State = {
+   user: null,
+}
 
-export function authReducer( state = initState, action: fromAuth.acciones ): AuthState {
-    switch (action.type) {
-        case fromAuth.SET_USER: 
-            return {
-                user: { ...action.user }
-            };
-        case fromAuth.UNSET_USER: 
-            return {
-                user: null
-            };
-        default:
-            return state;
-    }
+const _authReducer = createReducer(initialState,
+
+    on( setUser, (state, { user }) => ({ ...state, user: { ...user }  })),
+    on( unSetUser, state => ({ ...state, user: null  })),
+
+);
+
+export function authReducer(state, action) {
+    return _authReducer(state, action);
 }

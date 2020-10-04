@@ -1,19 +1,21 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { StoreModule } from '@ngrx/store';
-import { ingresoEgresoReducer } from './ingreso-egreso.reducer';
+import { ReactiveFormsModule } from '@angular/forms';
+import { ChartsModule } from 'ng2-charts';
+
+import { DashboardRoutesModule } from '../dashboard/dashboard-routes.module';
+import { SharedModule } from '../shared/shared.module';
 
 import { DashboardComponent } from '../dashboard/dashboard.component';
 import { IngresoEgresoComponent } from './ingreso-egreso.component';
 import { EstadisticaComponent } from './estadistica/estadistica.component';
 import { DetalleComponent } from './detalle/detalle.component';
-import { OrdenIngresoEgresoPipe } from './orden-ingreso-egreso.pipe';
+import { OrdenIngresoPipe } from '../pipes/orden-ingreso.pipe';
 
-import { ReactiveFormsModule } from '@angular/forms';
-import { ChartsModule } from 'ng2-charts';
-import { SharedModule } from '../shared/shared.module';
-import { DashboardRoutingModule } from '../dashboard/dashboard-routing.module';
+import { StoreModule } from '@ngrx/store';
+import { ingresoEgresoReducer } from './ingreso-egreso.reducer';
+
 
 
 @NgModule({
@@ -21,16 +23,17 @@ import { DashboardRoutingModule } from '../dashboard/dashboard-routing.module';
     DashboardComponent,
     IngresoEgresoComponent,
     EstadisticaComponent,
-    DetalleComponent,
-    OrdenIngresoEgresoPipe
+    DetalleComponent,  
+    OrdenIngresoPipe
   ],
   imports: [
     CommonModule,
+    StoreModule.forFeature('ingresosEgresos', ingresoEgresoReducer ),
     ReactiveFormsModule,
     ChartsModule,
     SharedModule,
-    DashboardRoutingModule,
-    StoreModule.forFeature('ingresoEgreso', ingresoEgresoReducer)
-  ]
+    DashboardRoutesModule
+  ],
+  exports: []
 })
 export class IngresoEgresoModule { }

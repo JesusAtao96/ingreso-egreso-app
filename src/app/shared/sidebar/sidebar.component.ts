@@ -1,10 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
+
+import { AuthService } from '../../services/auth.service';
 import { Store } from '@ngrx/store';
-import { AppState } from './../../app.reducer';
+import { AppState } from 'src/app/app.reducer';
+
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { AuthService } from '../../auth/auth.service';
-import { IngresoEgresoService } from './../../ingreso-egreso/ingreso-egreso.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -13,26 +15,30 @@ import { IngresoEgresoService } from './../../ingreso-egreso/ingreso-egreso.serv
 })
 export class SidebarComponent implements OnInit, OnDestroy {
 
-  nombre: string;
-  subscription: Subscription = new Subscription();
+  nombre: string = '';
+  userSubs: Subscription;
 
-  constructor( public authService: AuthService, public ingresoEgresoService: IngresoEgresoService, private store: Store<AppState> ) { }
+  constructor( private authService: AuthService,
+               private router: Router,
+               private store: Store<AppState> ) { }
 
   ngOnInit() {
-    this.subscription = this.store.select('auth')
-      .pipe(
-        filter( auth => auth.user != null )
-      )
-      .subscribe( auth => this.nombre = auth.user.nombre );
+    this.userSubs = this.store.select('user')
+                      .pipe(
+                        filter( ({user}) => user != null )
+                      )
+                      .subscribe( ({ user }) => this.nombre = user.nombre );
   }
 
   ngOnDestroy() {
-    this.subscription.unsubscribe();
+    this.userSubs.unsubscribe();
   }
 
   logout() {
-    this.authService.logout();
-    this.ingresoEgresoService.cancelarSubscriptions();
+    this.authService.logout().then( () => {
+      this.router.navigate(['/login']);
+    })
+
   }
 
 }

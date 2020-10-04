@@ -1,5 +1,5 @@
 {
   "projects": {
-    "default": "ingreso-egreso-app-8d79b"
+    "prod": "ingreso-egreso-app-8d79b"
   }
 }

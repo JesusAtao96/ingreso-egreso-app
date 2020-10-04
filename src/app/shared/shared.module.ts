@@ -6,12 +6,13 @@ import { NavbarComponent } from './navbar/navbar.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { RouterModule } from '@angular/router';
 
+
+
 @NgModule({
-  
   declarations: [
     FooterComponent,
     NavbarComponent,
-    SidebarComponent
+    SidebarComponent,
   ],
   imports: [
     CommonModule,
@@ -20,7 +21,7 @@ import { RouterModule } from '@angular/router';
   exports: [
     FooterComponent,
     NavbarComponent,
-    SidebarComponent
+    SidebarComponent,
   ]
 })
 export class SharedModule { }

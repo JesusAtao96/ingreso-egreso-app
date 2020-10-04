@@ -1,16 +1,15 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
-
-import { IngresoEgreso } from './ingreso-egreso.model';
-import { IngresoEgresoService } from './ingreso-egreso.service';
-
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { IngresoEgreso } from '../models/ingreso-egreso.model';
+import { IngresoEgresoService } from '../services/ingreso-egreso.service';
 import Swal from 'sweetalert2';
 
 import { Store } from '@ngrx/store';
-import * as fromIngresoEgreso from './ingreso-egreso.reducer';
-//import { AppState } from '../app.reducer';
+import { AppState } from '../app.reducer';
+import * as ui from '../shared/ui.actions';
 import { Subscription } from 'rxjs';
-import { ActivarLoadingAction, DesactivarLoadingAction } from './../shared/ui.actions';
+
+
 
 @Component({
   selector: 'app-ingreso-egreso',
@@ -19,45 +18,52 @@ import { ActivarLoadingAction, DesactivarLoadingAction } from './../shared/ui.ac
 })
 export class IngresoEgresoComponent implements OnInit, OnDestroy {
 
-  form: FormGroup;
-  tipo = 'ingreso';
+  ingresoForm: FormGroup;
+  tipo       : string  = 'ingreso';
+  cargando   : boolean = false;
+  loadingSubs: Subscription;
 
-  loadingSubs: Subscription = new Subscription();
-  cargando: boolean;
-
-  constructor( public ingresoEgresoService: IngresoEgresoService, private store: Store<fromIngresoEgreso.AppState> ) { }
+  constructor( private fb: FormBuilder,
+               private ingresoEgresoService: IngresoEgresoService,
+               private store: Store<AppState>) { }
 
   ngOnInit() {
-    this.loadingSubs = this.store.select('ui')
-      .subscribe( ui => this.cargando = ui.isLoading );
 
-    this.form = new FormGroup({
-      'descripcion': new FormControl('', Validators.required),
-      'monto': new FormControl(0, Validators.min(0)),
+    this.loadingSubs = this.store.select('ui')
+      .subscribe( ({ isLoading }) => this.cargando = isLoading );
+
+    this.ingresoForm = this.fb.group({
+      descripcion: ['', Validators.required ],
+      monto: ['', Validators.required ],
     });
+
   }
 
   ngOnDestroy() {
     this.loadingSubs.unsubscribe();
   }
 
-  crearIngresoEgreso() {
-    this.store.dispatch( new ActivarLoadingAction() );
-
-    const ingresoEgreso = new IngresoEgreso({ ...this.form.value, tipo: this.tipo });
-
-    this.ingresoEgresoService.crearIngresoEgreso(ingresoEgreso)
-      .then(() => {
-        this.store.dispatch( new DesactivarLoadingAction() );
-        Swal('Creado', ingresoEgreso.descripcion, 'success');
-        this.form.reset({ monto: 0 });
-      })
-      .catch(error => {
-        this.store.dispatch( new DesactivarLoadingAction() );
-        Swal('Error en el registro', error.message, 'error');
-      });
+  guardar() {
 
     
+    if ( this.ingresoForm.invalid ) { return; }
+    
+    this.store.dispatch( ui.isLoading() );
+
+    const { descripcion, monto } = this.ingresoForm.value;
+
+    const ingresoEgreso = new IngresoEgreso(descripcion, monto, this.tipo);
+
+    this.ingresoEgresoService.crearIngresoEgreso( ingresoEgreso )
+      .then( () => { 
+        this.ingresoForm.reset();
+        this.store.dispatch( ui.stopLoading() );
+        Swal.fire('Registro creado', descripcion , 'success');
+      })
+      .catch( err => {
+        this.store.dispatch( ui.stopLoading() );
+        Swal.fire('Error', err.message , 'error');
+      });
   }
 
 }
