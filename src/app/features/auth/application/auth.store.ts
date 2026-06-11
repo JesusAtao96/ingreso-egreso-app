@@ -13,18 +13,35 @@ import { type User } from '../domain/user.entity';
 
 /**
  * State shape for the AuthStore. Kept narrow on purpose — UI only
- * sees what it needs (current user, busy flag, last error).
+ * sees what it needs (current user, busy flag, last error, and
+ * a `hydrated` flag that flips true the first time the Firebase
+ * `authState$` stream emits).
+ *
+ * The `hydrated` flag is what the `AuthGuard` watches: before the
+ * first emission we don't yet know whether the session is
+ * restored from disk, so we can't decide yet whether to let the
+ * user in or kick them to /login. Showing a global splash while
+ * we wait is the cleanest fix for the "F5 sends me to /login
+ * for a second" flicker.
  */
 export interface AuthStoreState {
   user: User | null;
   loading: boolean;
   error: string | null;
+  hydrated: boolean;
 }
 
 const INITIAL_STATE: AuthStoreState = {
   user: null,
-  loading: false,
+  // `loading` starts true because we're about to ask Firebase
+  // whether a session is restored — anything we render before
+  // that returns would be a guess. The AppComponent shows a
+  // splash while this is true.
+  loading: true,
   error: null,
+  // `hydrated` flips true the first time authState$ emits.
+  // Until then, AuthGuard waits instead of redirecting.
+  hydrated: false,
 };
 
 /**
@@ -107,11 +124,23 @@ export const AuthStore = signalStore(
       const port = inject(AUTH_PORT);
       const sub = port.authState$().subscribe({
         next: (user) => {
-          patchState(store, { user, loading: false, error: null });
+          patchState(store, {
+            user,
+            loading: false,
+            error: null,
+            hydrated: true,
+          });
         },
         error: (err) => {
           const message = err instanceof Error ? err.message : String(err);
-          patchState(store, { error: message, loading: false });
+          // Even on error, mark hydrated — we tried and failed, so
+          // AuthGuard can now decide (it'll see user=null and
+          // redirect to /auth/login).
+          patchState(store, {
+            error: message,
+            loading: false,
+            hydrated: true,
+          });
         },
       });
       // Keep the subscription alive for the lifetime of the store.

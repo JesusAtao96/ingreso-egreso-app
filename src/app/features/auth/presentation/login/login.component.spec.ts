@@ -32,11 +32,14 @@ interface SetupOptions {
 
 async function setup(options: SetupOptions = {}) {
   const signIn = vi.fn().mockResolvedValue(undefined);
-  const subject = new Subject<User | null>();
-  if (options.initialUser) {
-    // Defer until the store subscribes.
-    queueMicrotask(() => subject.next(options.initialUser!));
-  }
+  // ReplaySubject(1) replays the most recent emission to new
+  // subscribers — exactly what we need so the store's
+  // onInit subscription receives the seed even though the
+  // subject was constructed before the store subscribed.
+  const { ReplaySubject } = await import('rxjs');
+  const subject = new ReplaySubject<User | null>(1);
+  const seed = options.initialUser === undefined ? null : options.initialUser;
+  subject.next(seed);
   const port: Partial<AuthPort> = {
     signIn: signIn as Mock,
     signUp: vi.fn().mockResolvedValue(undefined),

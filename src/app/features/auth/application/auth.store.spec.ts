@@ -64,12 +64,15 @@ describe('AuthStore', () => {
     TestBed.resetTestingModule();
   });
 
-  it('starts unauthenticated and not loading', () => {
+  it('starts unauthenticated, loading, and not yet hydrated', () => {
     const { store } = setup();
 
     expect(store.user()).toBeNull();
-    expect(store.loading()).toBe(false);
+    // `loading` is true on first creation so the AppComponent can
+    // show a splash until the port's first emission.
+    expect(store.loading()).toBe(true);
     expect(store.isAuthenticated()).toBe(false);
+    expect(store.hydrated()).toBe(false);
   });
 
   it('restores the session when the port emits a User on init (restore-session)', async () => {
