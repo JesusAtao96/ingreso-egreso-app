@@ -1,0 +1,61 @@
+<aside class="glass m-4 p-4 w-60 shrink-0 self-start sticky top-4" data-testid="sidebar">
+  <div class="flex items-center gap-3 p-3 mb-4 border-b border-white/10">
+    <div class="w-10 h-10 rounded-full overflow-hidden border border-white/20 shrink-0">
+      <img src="assets/images/faces/face1.jpg" alt="profile image" class="w-full h-full object-cover" />
+    </div>
+    @if (user(); as u) {
+      <div class="flex flex-col min-w-0">
+        <p class="text-sm font-medium text-(--color-ink) truncate" data-testid="sidebar-user">{{ u.nombre }}</p>
+        <small class="text-xs text-(--color-ink-muted)">Gerente</small>
+      </div>
+    }
+  </div>
+
+  <ul class="flex flex-col gap-1 list-none p-0 m-0">
+    <li>
+      <a
+        routerLink="/"
+        routerLinkActive="bg-white/10 text-(--color-accent)"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-(--color-ink) hover:bg-white/5 transition-colors no-underline"
+        data-testid="sidebar-link-dashboard"
+      >
+        <span class="material-symbols-outlined">dashboard</span>
+        <span>Dashboard</span>
+      </a>
+    </li>
+    <li>
+      <a
+        routerLink="/ingreso-egreso"
+        routerLinkActive="bg-white/10 text-(--color-accent)"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-(--color-ink) hover:bg-white/5 transition-colors no-underline"
+        data-testid="sidebar-link-items"
+      >
+        <span class="material-symbols-outlined">list_alt</span>
+        <span>Ingresos y Egresos</span>
+      </a>
+    </li>
+    <li>
+      <a
+        routerLink="/detalle"
+        routerLinkActive="bg-white/10 text-(--color-accent)"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-(--color-ink) hover:bg-white/5 transition-colors no-underline"
+        data-testid="sidebar-link-detalle"
+      >
+        <span class="material-symbols-outlined">table</span>
+        <span>Detalle</span>
+      </a>
+    </li>
+    <li class="mt-2 pt-2 border-t border-white/10">
+      <a
+        href="#"
+        (click)="onLogout($event)"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-(--color-ink) hover:bg-white/5 transition-colors no-underline cursor-pointer"
+        data-testid="sidebar-logout"
+      >
+        <span class="material-symbols-outlined">logout</span>
+        <span>Cerrar sesión</span>
+      </a>
+    </li>
+  </ul>
+</aside>

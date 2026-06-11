@@ -1,0 +1,69 @@
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4" data-testid="estadistica">
+  <div class="glass-card glass-card-hover p-6" data-testid="card-ingresos">
+    <h6 class="text-xs uppercase tracking-wider text-(--color-ink-muted) mb-2">Ingresos</h6>
+    <p
+      class="text-3xl font-semibold text-(--color-success) mb-0"
+      data-testid="total-ingresos"
+    >
+      {{ totalIngresos() | number:'1.2-2' }}
+    </p>
+  </div>
+
+  <div class="glass-card glass-card-hover p-6" data-testid="card-egresos">
+    <h6 class="text-xs uppercase tracking-wider text-(--color-ink-muted) mb-2">Egresos</h6>
+    <p
+      class="text-3xl font-semibold text-(--color-danger) mb-0"
+      data-testid="total-egresos"
+    >
+      {{ totalEgresos() | number:'1.2-2' }}
+    </p>
+  </div>
+
+  <div
+    class="glass-card glass-card-hover p-6"
+    [class.border-(--color-success)]="balance() >= 0"
+    [class.border-(--color-danger)]="balance() < 0"
+    data-testid="card-balance"
+  >
+    <h6 class="text-xs uppercase tracking-wider text-(--color-ink-muted) mb-2">Balance</h6>
+    <p
+      class="text-3xl font-semibold mb-1"
+      [class.text-(--color-success)]="balance() >= 0"
+      [class.text-(--color-danger)]="balance() < 0"
+      data-testid="total-balance"
+    >
+      {{ balance() | number:'1.2-2' }}
+    </p>
+    <small class="text-(--color-ink-muted)">
+      {{ count() }} {{ count() === 1 ? 'movimiento' : 'movimientos' }}
+    </small>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+  <div class="glass-card glass-card-hover p-6" data-testid="card-doughnut">
+    <h6 class="text-base font-medium text-(--color-ink) mb-4">Proporción ingresos / egresos</h6>
+    <div class="relative" style="height: 280px;">
+      <canvas
+        baseChart
+        [data]="doughnutData()"
+        [options]="doughnutOptions"
+        [type]="'doughnut'"
+        data-testid="doughnut-chart"
+      ></canvas>
+    </div>
+  </div>
+
+  <div class="glass-card glass-card-hover p-6" data-testid="card-bar">
+    <h6 class="text-base font-medium text-(--color-ink) mb-4">Comparación mensual</h6>
+    <div class="relative" style="height: 280px;">
+      <canvas
+        baseChart
+        [data]="barData()"
+        [options]="barOptions"
+        [type]="'bar'"
+        data-testid="bar-chart"
+      ></canvas>
+    </div>
+  </div>
+</div>

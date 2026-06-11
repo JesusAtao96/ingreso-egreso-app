@@ -1,0 +1,114 @@
+<div class="min-h-screen flex items-center justify-center px-4 py-8" data-testid="register-page">
+  <div class="glass-card w-full max-w-md p-8 sm:p-10">
+    <div class="text-center mb-6">
+      <img src="assets/images/logo.svg" alt="logo" class="mx-auto h-12 w-auto" />
+    </div>
+
+    <h4 class="text-2xl font-semibold text-(--color-ink) mb-1">Crear cuenta nueva</h4>
+    <h6 class="text-(--color-ink-muted) font-normal mb-6">Empezá a registrar tus ingresos y egresos.</h6>
+
+    <form
+      (submit)="onSubmit(); $event.preventDefault()"
+      novalidate
+      data-testid="register-form"
+      class="flex flex-col gap-5"
+    >
+      <div class="flex flex-col gap-2">
+        <label for="nombre" class="text-sm text-(--color-ink-muted)">Nombre</label>
+        <input
+          id="nombre"
+          type="text"
+          class="glass-input w-full px-4 py-3"
+          placeholder="Tu nombre"
+          data-testid="register-nombre"
+          [formField]="registerForm.nombre"
+        />
+        @if (registerForm.nombre().touched() && registerForm.nombre().errors().length) {
+          <small class="text-(--color-danger) text-sm" data-testid="register-nombre-error">
+            {{ registerForm.nombre().errors()[0].message }}
+          </small>
+        }
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label for="email" class="text-sm text-(--color-ink-muted)">Correo electrónico</label>
+        <input
+          id="email"
+          type="email"
+          class="glass-input w-full px-4 py-3"
+          placeholder="nombre@ejemplo.com"
+          data-testid="register-email"
+          [formField]="registerForm.email"
+        />
+        @if (registerForm.email().touched() && registerForm.email().errors().length) {
+          <small class="text-(--color-danger) text-sm" data-testid="register-email-error">
+            {{ registerForm.email().errors()[0].message }}
+          </small>
+        }
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label for="password" class="text-sm text-(--color-ink-muted)">Contraseña</label>
+        <input
+          id="password"
+          type="password"
+          class="glass-input w-full px-4 py-3"
+          placeholder="Mínimo 6 caracteres"
+          data-testid="register-password"
+          [formField]="registerForm.password"
+        />
+        @if (registerForm.password().touched() && registerForm.password().errors().length) {
+          <small class="text-(--color-danger) text-sm" data-testid="register-password-error">
+            {{ registerForm.password().errors()[0].message }}
+          </small>
+        }
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label for="confirmPassword" class="text-sm text-(--color-ink-muted)">Confirmar contraseña</label>
+        <input
+          id="confirmPassword"
+          type="password"
+          class="glass-input w-full px-4 py-3"
+          placeholder="Repetí la contraseña"
+          data-testid="register-confirm"
+          [formField]="registerForm.confirmPassword"
+        />
+        @if (registerForm.confirmPassword().touched() && registerForm.confirmPassword().errors().length) {
+          <small class="text-(--color-danger) text-sm" data-testid="register-confirm-error">
+            {{ registerForm.confirmPassword().errors()[0].message }}
+          </small>
+        }
+      </div>
+
+      @if (authError(); as message) {
+        <div
+          class="glass-card border-(--color-danger) text-(--color-danger) px-4 py-3 text-sm"
+          role="alert"
+          data-testid="register-server-error"
+        >
+          {{ message }}
+        </div>
+      }
+
+      <button
+        type="submit"
+        class="glass-btn glass-btn-primary w-full px-4 py-3 text-base"
+        data-testid="register-submit"
+        [disabled]="loading()"
+      >
+        @if (loading()) {
+          <span class="material-symbols-outlined animate-spin mr-2">sync</span>
+          Creando…
+        } @else {
+          CREAR CUENTA
+        }
+      </button>
+
+      <div class="text-center text-sm text-(--color-ink-muted) mt-2">
+        ¿Ya tenés cuenta?
+        <a routerLink="/login" class="text-(--color-accent) hover:underline ml-1">Iniciar sesión</a>
+      </div>
+    </form>
+  </div>
+</div>

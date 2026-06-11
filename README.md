@@ -2,6 +2,25 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.0.6.
 
+## Configuración de Firebase
+
+Antes de ejecutar la aplicación, debes configurar tus credenciales de Firebase en el archivo `src/environments/environment.ts` y/o `src/environments/environment.prod.ts`. Reemplaza los asteriscos con la configuración de tu propio proyecto de Firebase:
+
+```typescript
+export const environment = {
+  production: false,
+  firebase: {
+    apiKey: "***************************************",
+    authDomain: "***************************************",
+    databaseURL: "***************************************",
+    projectId: "***************************************",
+    storageBucket: "***************************************",
+    messagingSenderId: "************",
+    appId: "***************************************"
+  }
+};
+```
+
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.

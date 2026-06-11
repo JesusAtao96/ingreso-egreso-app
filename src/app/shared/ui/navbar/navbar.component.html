@@ -1,0 +1,34 @@
+<nav
+  class="glass mx-4 mt-4 px-4 py-3 flex items-center justify-between sticky top-4 z-10"
+  data-testid="navbar"
+>
+  <a href="/" class="flex items-center gap-2 no-underline shrink-0">
+    <img src="assets/images/logo.svg" alt="logo" class="h-8 w-auto" />
+  </a>
+
+  <div class="flex items-center gap-3">
+    @if (navbarUser(); as user) {
+      <a
+        href="#"
+        class="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-white/5 transition-colors no-underline"
+        id="userDropdown"
+        data-testid="navbar-user"
+      >
+        <span class="text-sm text-(--color-ink)">Hello, {{ user.nombre }}!</span>
+        <img
+          class="w-7 h-7 rounded-full object-cover"
+          src="assets/images/faces/face1.jpg"
+          alt="Profile image"
+        />
+      </a>
+    }
+    <button
+      class="md:hidden flex items-center justify-center w-9 h-9 rounded-xl hover:bg-white/5 transition-colors"
+      type="button"
+      aria-label="Open menu"
+      data-testid="navbar-toggle"
+    >
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+  </div>
+</nav>

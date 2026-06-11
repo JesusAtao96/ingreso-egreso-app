@@ -1,0 +1,80 @@
+<div class="min-h-screen flex items-center justify-center px-4 py-8" data-testid="login-page">
+  <div class="glass-card w-full max-w-md p-8 sm:p-10">
+    <div class="text-center mb-6">
+      <img src="assets/images/logo.svg" alt="logo" class="mx-auto h-12 w-auto" />
+    </div>
+
+    <h4 class="text-2xl font-semibold text-(--color-ink) mb-1">¡Hola! Vamos a comenzar</h4>
+    <h6 class="text-(--color-ink-muted) font-normal mb-6">Ingresá tus credenciales para continuar.</h6>
+
+    <form
+      (submit)="onSubmit(); $event.preventDefault()"
+      novalidate
+      data-testid="login-form"
+      class="flex flex-col gap-5"
+    >
+      <div class="flex flex-col gap-2">
+        <label for="email" class="text-sm text-(--color-ink-muted)">Correo electrónico</label>
+        <input
+          id="email"
+          type="email"
+          class="glass-input w-full px-4 py-3"
+          placeholder="nombre@ejemplo.com"
+          data-testid="login-email"
+          [formField]="loginForm.email"
+        />
+        @if (loginForm.email().touched() && loginForm.email().errors().length) {
+          <small class="text-(--color-danger) text-sm" data-testid="login-email-error">
+            {{ loginForm.email().errors()[0].message }}
+          </small>
+        }
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label for="password" class="text-sm text-(--color-ink-muted)">Contraseña</label>
+        <input
+          id="password"
+          type="password"
+          class="glass-input w-full px-4 py-3"
+          placeholder="********"
+          data-testid="login-password"
+          [formField]="loginForm.password"
+        />
+        @if (loginForm.password().touched() && loginForm.password().errors().length) {
+          <small class="text-(--color-danger) text-sm" data-testid="login-password-error">
+            {{ loginForm.password().errors()[0].message }}
+          </small>
+        }
+      </div>
+
+      @if (authError(); as message) {
+        <div
+          class="glass-card border-(--color-danger) text-(--color-danger) px-4 py-3 text-sm"
+          role="alert"
+          data-testid="login-server-error"
+        >
+          {{ message }}
+        </div>
+      }
+
+      <button
+        type="submit"
+        class="glass-btn glass-btn-primary w-full px-4 py-3 text-base"
+        data-testid="login-submit"
+        [disabled]="loading()"
+      >
+        @if (loading()) {
+          <span class="material-symbols-outlined animate-spin mr-2">sync</span>
+          Ingresando…
+        } @else {
+          INGRESAR
+        }
+      </button>
+
+      <div class="text-center text-sm text-(--color-ink-muted) mt-2">
+        ¿No tenés cuenta?
+        <a routerLink="/register" class="text-(--color-accent) hover:underline ml-1">Crear cuenta</a>
+      </div>
+    </form>
+  </div>
+</div>
