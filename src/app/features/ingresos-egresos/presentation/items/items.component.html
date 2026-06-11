@@ -1,0 +1,85 @@
+<div class="max-w-2xl mx-auto py-6" data-testid="items-page">
+  <div class="glass-card p-6 sm:p-8">
+    <h4 class="text-xl font-semibold text-(--color-ink) mb-1">Agregar ingreso o egreso</h4>
+    <p class="text-(--color-ink-muted) mb-6">Cargá un nuevo movimiento. Los totales se actualizan al guardar.</p>
+
+    <form
+      (submit)="onSubmit(); $event.preventDefault()"
+      novalidate
+      data-testid="items-form"
+      class="flex flex-col gap-5"
+    >
+      <div class="flex flex-col gap-2">
+        <label for="descripcion" class="text-sm text-(--color-ink-muted)">Descripción</label>
+        <input
+          id="descripcion"
+          type="text"
+          class="glass-input w-full px-4 py-3"
+          placeholder="Ej: Sueldo, Alquiler…"
+          data-testid="items-descripcion"
+          [formField]="itemForm.descripcion"
+        />
+        @if (itemForm.descripcion().touched() && itemForm.descripcion().errors().length) {
+          <small class="text-(--color-danger) text-sm" data-testid="items-descripcion-error">
+            {{ itemForm.descripcion().errors()[0].message }}
+          </small>
+        }
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label for="monto" class="text-sm text-(--color-ink-muted)">Monto</label>
+        <input
+          id="monto"
+          type="number"
+          step="0.01"
+          class="glass-input w-full px-4 py-3"
+          placeholder="0.00"
+          data-testid="items-monto"
+          [formField]="itemForm.monto"
+        />
+        @if (itemForm.monto().touched() && itemForm.monto().errors().length) {
+          <small class="text-(--color-danger) text-sm" data-testid="items-monto-error">
+            {{ itemForm.monto().errors()[0].message }}
+          </small>
+        }
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label for="tipo" class="text-sm text-(--color-ink-muted)">Tipo</label>
+        <select
+          id="tipo"
+          class="glass-input w-full px-4 py-3 appearance-none cursor-pointer"
+          data-testid="items-tipo"
+          [formField]="itemForm.tipo"
+        >
+          <option value="ingreso">Ingreso</option>
+          <option value="egreso">Egreso</option>
+        </select>
+      </div>
+
+      @if (error(); as message) {
+        <div
+          class="glass-card border-(--color-danger) text-(--color-danger) px-4 py-3 text-sm"
+          role="alert"
+          data-testid="items-server-error"
+        >
+          {{ message }}
+        </div>
+      }
+
+      <button
+        type="submit"
+        class="glass-btn glass-btn-primary w-full px-4 py-3 text-base mt-2"
+        data-testid="items-submit"
+        [disabled]="loading() || !user()"
+      >
+        @if (loading()) {
+          <span class="material-symbols-outlined animate-spin mr-2">sync</span>
+          Guardando…
+        } @else {
+          Agregar
+        }
+      </button>
+    </form>
+  </div>
+</div>

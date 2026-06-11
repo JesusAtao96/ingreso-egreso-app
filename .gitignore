@@ -18,11 +18,15 @@
 *.sublime-workspace
 
 # IDE - VSCode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+/.vscode/*
+!/.vscode/settings.json
+!/.vscode/tasks.json
+!/.vscode/launch.json
+!/.vscode/extensions.json
+
+# Angular cache
+/.angular/cache
+/.angular
 
 # misc
 /.sass-cache
@@ -34,6 +38,21 @@ yarn-error.log
 testem.log
 /typings
 
+# Playwright
+/test-results
+/playwright-report
+/blob-report
+/playwright/.cache
+
 # System Files
 .DS_Store
 Thumbs.db
+
+# AI Agents & Configuration
+/.agents
+/.atl
+/.claude
+/openspec
+opencode.json
+skills-lock.json
+/.codex
