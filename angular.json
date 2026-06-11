@@ -32,6 +32,11 @@
                 "glob": "**/*",
                 "input": "src",
                 "output": "/"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/material-symbols",
+                "output": "/material-symbols"
               }
             ],
             "styles": [

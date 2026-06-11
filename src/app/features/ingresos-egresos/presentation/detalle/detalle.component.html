@@ -21,7 +21,7 @@
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="text-xs uppercase tracking-wider text-(--color-ink-muted) border-b border-white/10">
+            <tr class="text-xs uppercase tracking-wider text-(--color-ink-muted) border-divider" style="border-bottom: 1px solid var(--color-divider);">
               <th scope="col" class="py-3 px-2 font-medium">Descripción</th>
               <th scope="col" class="py-3 px-2 font-medium text-right">Monto</th>
               <th scope="col" class="py-3 px-2 font-medium">Tipo</th>
@@ -32,7 +32,7 @@
             @for (item of sortedItems(); track item.uid) {
               <tr
                 [attr.data-testid]="'detalle-row-' + item.uid"
-                class="border-b border-white/5 hover:bg-white/5 transition-colors"
+                class="border-divider hover:bg-hover transition-colors" style="border-bottom: 1px solid var(--color-divider);"
               >
                 <td class="py-3 px-2 text-(--color-ink)">{{ item.descripcion }}</td>
                 <td class="py-3 px-2 text-(--color-ink) text-right font-medium">

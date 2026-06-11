@@ -1,32 +1,79 @@
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/angular';
-import { NavbarComponent, type NavbarUser } from './navbar.component';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { TestBed } from '@angular/core/testing';
+
+import { NavbarComponent } from './navbar.component';
+import { ThemeService } from '../../../core/theme/theme.service';
 
 /**
- * Unit tests for NavbarComponent using Angular Testing Library.
+ * Unit tests for the NavbarComponent theme toggle.
  *
- * Scenarios from user-auth spec (auth-state-listener):
- *  - When a user is signed in, the navbar greets them by name.
- *  - When no user is signed in, the greeting is hidden.
+ * The component binds to `ThemeService.theme()` via a signal; the
+ * icon shown reflects the *destination* theme (sun = go light,
+ * moon = go dark). The rendered aria-label changes accordingly.
  */
-describe('NavbarComponent', () => {
-  it('renders the user name in the greeting when a user is provided', async () => {
-    const user: NavbarUser = { nombre: 'Ada Lovelace' };
 
-    await render(NavbarComponent, {
-      inputs: { navbarUser: user },
+const STORAGE_KEY = 'app:theme';
+
+function matchMediaMock(prefersLight: boolean): void {
+  vi.stubGlobal(
+    'matchMedia',
+    vi.fn((query: string) => ({
+      matches: query === '(prefers-color-scheme: light)' ? prefersLight : false,
+      media: query,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+      onchange: null,
+    })),
+  );
+}
+
+describe('NavbarComponent — theme toggle', () => {
+  beforeEach(() => {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // ignore
+    }
+    document.documentElement.removeAttribute('data-theme');
+    matchMediaMock(false);
+    TestBed.configureTestingModule({
+      imports: [NavbarComponent],
     });
-
-    const greeting = screen.getByTestId('navbar-user');
-    expect(greeting).toBeInTheDocument();
-    expect(greeting).toHaveTextContent('Ada Lovelace');
   });
 
-  it('hides the greeting when no user is signed in', async () => {
-    await render(NavbarComponent, {
-      inputs: { navbarUser: null },
-    });
+  afterEach(() => {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // ignore
+    }
+    document.documentElement.removeAttribute('data-theme');
+    vi.unstubAllGlobals();
+  });
 
-    expect(screen.queryByTestId('navbar-user')).not.toBeInTheDocument();
+  it('shows the sun icon in dark mode (clicking switches to light)', () => {
+    const fixture = TestBed.createComponent(NavbarComponent);
+    fixture.detectChanges();
+    const button = fixture.nativeElement.querySelector(
+      '[data-testid="navbar-theme-toggle"]',
+    );
+    expect(button).toBeTruthy();
+    expect(button.getAttribute('aria-label')).toBe('Switch to light theme');
+    expect(button.querySelector('.material-symbols-outlined').textContent.trim()).toBe('light_mode');
+  });
+
+  it('flips the theme when the button is clicked', () => {
+    const fixture = TestBed.createComponent(NavbarComponent);
+    fixture.detectChanges();
+    const button: HTMLButtonElement = fixture.nativeElement.querySelector(
+      '[data-testid="navbar-theme-toggle"]',
+    );
+    button.click();
+    fixture.detectChanges();
+    expect(button.getAttribute('aria-label')).toBe('Switch to dark theme');
+    expect(document.documentElement.getAttribute('data-theme')).toBe('light');
   });
 });
