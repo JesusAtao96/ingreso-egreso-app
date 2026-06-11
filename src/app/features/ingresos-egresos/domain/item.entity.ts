@@ -2,7 +2,7 @@
  * Domain entity: IncomeExpenseItem.
  *
  * Mirrors the Firestore document stored under
- * `users/{uid}/ingresos-egresos/items/{itemId}`. The `uid` is the
+ * `{uid}/ingresos-egresos/items/{itemId}`. The `uid` is the
  * Firestore document id and is assigned by the adapter; everything
  * else comes from the form (descripcion, monto, tipo) or is derived
  * at write time (fecha).

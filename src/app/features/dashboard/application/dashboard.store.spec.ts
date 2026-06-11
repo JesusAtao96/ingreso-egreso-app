@@ -60,6 +60,7 @@ function setup(): TestHandles {
     create: async () => 'new-id',
     delete: async () => undefined,
     listenItems: () => itemsSubject.asObservable() as Observable<readonly Item[]>,
+    refreshItems: () => itemsSubject.asObservable() as Observable<readonly Item[]>,
   };
 
   const authPort: AuthPort = {

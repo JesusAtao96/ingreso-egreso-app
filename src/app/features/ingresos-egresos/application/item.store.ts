@@ -75,12 +75,13 @@ export const ItemStore = signalStore(
 
     return {
       /**
-       * Validate, persist, and surface errors for a new item.
+       * Validate, persist, and refresh the items list.
        *
-       * The list itself is NOT patched here — the real-time listener
-       * is the single source of truth for the items array. By the
-       * time this method returns, Firestore will have emitted the
-       * new document and the listener will have patched state.
+       * The list itself is NOT patched here optimistically — the
+       * Firestore JS SDK lite does not support realtime
+       * (`onSnapshot`), so we re-fetch the list after every
+       * successful mutation. By the time `addItem` returns, the
+       * store's `items` signal reflects the post-write state.
        */
       async addItem(uid: string, draft: ItemDraft): Promise<void> {
         const parsed = ItemSchema.safeParse(draft);
@@ -100,13 +101,13 @@ export const ItemStore = signalStore(
           patchState(store, { loading: false, error: message });
           return;
         }
+        // Refresh the list now that the write landed.
+        await this.refreshList(uid);
         patchState(store, { loading: false });
       },
 
       /**
-       * Validate the id, remove the doc from Firestore, and surface
-       * errors. The listener will pick up the deletion and patch
-       * `items` accordingly.
+       * Validate the id, remove the doc from Firestore, refresh.
        */
       async deleteItem(uid: string, itemId: string): Promise<void> {
         if (!itemId) {
@@ -121,12 +122,35 @@ export const ItemStore = signalStore(
           patchState(store, { loading: false, error: message });
           return;
         }
+        await this.refreshList(uid);
         patchState(store, { loading: false });
+      },
+
+      /** Re-fetch the items list for `uid`. Public so views can refresh. */
+      async refresh(uid: string): Promise<void> {
+        await this.refreshList(uid);
       },
 
       /** Reset the error flag (used by the form to clear messages). */
       clearError(): void {
         patchState(store, { error: null });
+      },
+
+      /** Private: subscribe to one fetch and patch state. */
+      async refreshList(uid: string): Promise<void> {
+        await new Promise<void>((resolve) => {
+          port.refreshItems(uid).subscribe({
+            next: (items) => {
+              patchState(store, { items, loading: false, error: null });
+              resolve();
+            },
+            error: (err: unknown) => {
+              const message = err instanceof Error ? err.message : String(err);
+              patchState(store, { error: message, loading: false });
+              resolve();
+            },
+          });
+        });
       },
     };
   }),
@@ -139,7 +163,8 @@ export const ItemStore = signalStore(
       // `switchMap` (re)subscribes to the items collection whenever
       // the user changes (login / logout / session restore). When
       // the user is null we emit an empty array so the items list
-      // is cleared.
+      // is cleared. Each subscription is a one-shot `getDocs` call
+      // (the Firestore JS SDK lite doesn't support `onSnapshot`).
       const sub = authPort
         .authState$()
         .pipe(

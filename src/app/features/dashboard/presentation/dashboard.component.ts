@@ -6,7 +6,6 @@ import { SidebarComponent } from '../../../shared/ui/sidebar/sidebar.component';
 import { FooterComponent } from '../../../shared/ui/footer/footer.component';
 import { AuthStore } from '../../auth/application/auth.store';
 import { DashboardStore } from '../application/dashboard.store';
-import { EstadisticaComponent } from './estadistica.component';
 
 /**
  * Authenticated dashboard shell.
@@ -30,7 +29,6 @@ import { EstadisticaComponent } from './estadistica.component';
     NavbarComponent,
     SidebarComponent,
     FooterComponent,
-    EstadisticaComponent,
   ],
   templateUrl: './dashboard.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

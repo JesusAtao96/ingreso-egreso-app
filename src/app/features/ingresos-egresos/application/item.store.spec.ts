@@ -32,6 +32,7 @@ interface MockItemPort {
   create: Mock;
   delete: Mock;
   listenItems: Mock;
+  refreshItems: Mock;
   itemsSubject: Subject<readonly Item[]>;
 }
 
@@ -54,6 +55,7 @@ function createMockItemPort(): MockItemPort {
     create: vi.fn().mockResolvedValue('new-id'),
     delete: vi.fn().mockResolvedValue(undefined),
     listenItems: vi.fn(() => subject.asObservable() as Observable<readonly Item[]>),
+    refreshItems: vi.fn(() => subject.asObservable() as Observable<readonly Item[]>),
   };
 }
 
@@ -134,21 +136,24 @@ describe('ItemStore', () => {
     expect(store.items()).toEqual([ITEM_INC]);
   });
 
-  it('addItem() calls port.create and the listener keeps state in sync (add-income-item)', async () => {
+  it('addItem() calls port.create and the post-write refresh keeps state in sync (add-income-item)', async () => {
     const { store, port } = setup({ initialUser: TEST_USER });
     await new Promise<void>((resolve) => queueMicrotask(resolve));
     await new Promise<void>((resolve) => queueMicrotask(resolve));
 
-    // After the create, the listener pushes the new item into state.
     const newItem: Item = { uid: 'new-id', descripcion: 'Sueldo', monto: 1000, tipo: 'ingreso', fecha: 1 };
     port.create.mockResolvedValueOnce('new-id');
-    // Simulate the real-time listener picking up the new doc.
-    port.itemsSubject.next([newItem]);
 
     const draft: ItemDraft = { descripcion: 'Sueldo', monto: 1000, tipo: 'ingreso' };
-    await store.addItem('u1', draft);
+    const addPromise = store.addItem('u1', draft);
+    // The refreshItems subscription is wired synchronously *inside*
+    // refreshList — emit the new list from the next microtask so
+    // the subscription is already in place.
+    queueMicrotask(() => port.itemsSubject.next([newItem]));
+    await addPromise;
 
     expect(port.create).toHaveBeenCalledWith('u1', draft);
+    expect(port.refreshItems).toHaveBeenCalledWith('u1');
     expect(store.items()).toEqual([newItem]);
     expect(store.loading()).toBe(false);
   });
@@ -177,20 +182,22 @@ describe('ItemStore', () => {
     expect(port.create).not.toHaveBeenCalled();
   });
 
-  it('deleteItem() calls port.delete and the listener removes the item (confirm-delete)', async () => {
+  it('deleteItem() calls port.delete and the post-write refresh removes the item (confirm-delete)', async () => {
     const { store, port } = setup({ initialUser: TEST_USER, initialItems: [ITEM_INC, ITEM_EXP] });
     await new Promise<void>((resolve) => queueMicrotask(resolve));
     await new Promise<void>((resolve) => queueMicrotask(resolve));
     await new Promise<void>((resolve) => queueMicrotask(resolve));
     expect(store.items()).toHaveLength(2);
 
-    // Simulate the listener removing the deleted item.
     port.delete.mockResolvedValueOnce(undefined);
-    port.itemsSubject.next([ITEM_INC]);
-
-    await store.deleteItem('u1', 'e1');
+    const deletePromise = store.deleteItem('u1', 'e1');
+    // The refreshItems subscription is wired synchronously *inside*
+    // refreshList — emit the shorter list from the next microtask.
+    queueMicrotask(() => port.itemsSubject.next([ITEM_INC]));
+    await deletePromise;
 
     expect(port.delete).toHaveBeenCalledWith('u1', 'e1');
+    expect(port.refreshItems).toHaveBeenCalledWith('u1');
     expect(store.items()).toEqual([ITEM_INC]);
   });
 

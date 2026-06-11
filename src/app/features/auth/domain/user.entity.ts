@@ -1,9 +1,9 @@
 /**
  * Domain entity: User.
  *
- * Mirrors the Firestore `users/{uid}` document. The `uid` is the
- * Firebase Auth identifier; the rest is the user profile written by
- * the register flow.
+ * Mirrors the Firestore `{uid}/usuario` document used by the
+ * legacy/course data. The `uid` is the Firebase Auth identifier; the
+ * rest is the user profile written by the register flow.
  *
  * Pure factory `makeUser` lives next to the type so domain code can
  * normalize raw shapes (Firestore snapshots, partial updates) without

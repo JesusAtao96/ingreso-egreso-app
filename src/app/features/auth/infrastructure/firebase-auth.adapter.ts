@@ -26,9 +26,11 @@ import { makeUser, type User } from '../domain/user.entity';
  * injection token by `appProviders` — it is the only place in the
  * application layer that imports from `firebase/*`.
  *
- * The `users/{uid}` Firestore document is the source of truth for the
- * user profile (nombre, email). The adapter writes the profile on
- * sign-up and reads it on every auth-state change.
+ * The course's original Firestore layout stores the user profile at
+ * `{uid}/usuario`. The adapter writes that legacy-compatible profile
+ * on sign-up and reads it on every auth-state change. It also falls
+ * back to the newer `users/{uid}` layout so accounts created during
+ * the modernization still restore correctly.
  */
 @Injectable({ providedIn: 'root' })
 export class FirebaseAuthAdapter implements AuthPort {
@@ -46,7 +48,7 @@ export class FirebaseAuthAdapter implements AuthPort {
     // own a valid Firebase Auth account — but the user will land
     // without a profile. The store surfaces the rejection so the
     // component can show a meaningful error.
-    await setDoc(doc(this.firestore, `users/${uid}`), { nombre, email });
+    await setDoc(doc(this.firestore, `${uid}/usuario`), { uid, nombre, email });
   }
 
   async signOut(): Promise<void> {
@@ -67,16 +69,20 @@ export class FirebaseAuthAdapter implements AuthPort {
   }
 
   /**
-   * Read the `users/{uid}` profile document. If the document does not
-   * exist (older accounts created before the profile collection was
-   * introduced) we fall back to a profile built from the Auth claims.
+   * Read the legacy `{uid}/usuario` profile document first because
+   * existing production/course data uses that path. If it does not
+   * exist, fall back to the newer `users/{uid}` profile document. If
+   * neither exists, build a profile from the Auth claims.
    */
   private async readProfile(uid: string, email: string): Promise<User> {
-    const snap = await getDoc(doc(this.firestore, `users/${uid}`));
-    if (!snap.exists()) {
+    const legacySnap = await getDoc(doc(this.firestore, `${uid}/usuario`));
+    const profileSnap = legacySnap.exists()
+      ? legacySnap
+      : await getDoc(doc(this.firestore, `users/${uid}`));
+    if (!profileSnap.exists()) {
       return makeUser({ uid, email });
     }
-    const data = snap.data() as { nombre?: string; email?: string };
+    const data = profileSnap.data() as { uid?: string; nombre?: string; email?: string };
     return makeUser({ uid, email: data.email ?? email, nombre: data.nombre });
   }
 }

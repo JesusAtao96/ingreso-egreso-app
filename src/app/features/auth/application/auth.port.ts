@@ -25,7 +25,7 @@ export interface AuthPort {
 
   /**
    * Create a brand-new Firebase Auth account AND a matching
-   * `users/{uid}` Firestore profile document.
+   * `{uid}/usuario` Firestore profile document.
    * Resolves with `void` on success. Rejects if the email is already
    * in use or the profile write fails.
    */

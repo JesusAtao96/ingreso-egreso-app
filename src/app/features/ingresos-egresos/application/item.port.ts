@@ -26,14 +26,22 @@ export type ItemDraft = Omit<Item, 'uid' | 'fecha'> & { fecha?: number };
  *     can patch state optimistically.
  *   - `delete(uid, itemId)` — remove an existing item. Resolves
  *     with void.
- *   - `listenItems(uid)` — real-time stream of the user's items.
- *     MUST emit a value on every change (including the empty
- *     array) so the store can react via `patchState`.
+ *   - `listenItems(uid)` — one-shot stream of the user's items
+ *     that the store re-subscribes to after every mutation. The
+ *     realtime variant (`onSnapshot`) is not available in the
+ *     bundled Firebase JS SDK lite, so this is a deliberate
+ *     "refresh-after-mutation" fallback. MUST emit a value
+ *     (including the empty array) so the store can react via
+ *     `patchState`.
+ *   - `refreshItems(uid)` — convenience alias for the store to
+ *     re-fetch after a write. Same semantics as `listenItems`
+ *     but named for intent.
  */
 export interface ItemPort {
   create(uid: string, draft: ItemDraft): Promise<string>;
   delete(uid: string, itemId: string): Promise<void>;
   listenItems(uid: string): Observable<readonly Item[]>;
+  refreshItems(uid: string): Observable<readonly Item[]>;
 }
 
 /**
