@@ -5,17 +5,6 @@
     <app-sidebar [user]="navbarUser()" (logout)="onLogout()" />
 
     <main class="flex-1 min-w-0 p-4 flex flex-col gap-4">
-      <section class="glass-card p-6">
-        <h4 class="text-xl font-semibold text-(--color-ink) mb-1">Resumen</h4>
-        <p class="text-(--color-ink-muted) mb-4">
-          Resumen general y comparación por mes. Agregá o quitá
-          movimientos desde la sección "Ingresos y Egresos" o
-          "Detalle" — los gráficos se actualizan al instante.
-        </p>
-
-        <app-estadistica />
-      </section>
-
       <section class="flex-1 min-h-0">
         <router-outlet />
       </section>

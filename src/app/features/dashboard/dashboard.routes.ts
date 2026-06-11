@@ -27,6 +27,13 @@ export const DASHBOARD_ROUTES: Routes = [
       ),
     children: [
       {
+        path: '',
+        loadComponent: () =>
+          import('./presentation/estadistica.component').then(
+            (m) => m.EstadisticaComponent,
+          ),
+      },
+      {
         path: 'ingreso-egreso',
         loadComponent: () =>
           import(
@@ -40,7 +47,6 @@ export const DASHBOARD_ROUTES: Routes = [
             '../ingresos-egresos/presentation/detalle/detalle.component'
           ).then((m) => m.DetalleComponent),
       },
-      { path: '', pathMatch: 'full', redirectTo: 'ingreso-egreso' },
     ],
   },
 ];
