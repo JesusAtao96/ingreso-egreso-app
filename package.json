@@ -30,14 +30,14 @@
     "firebase": "~11.0.0",
     "material-symbols": "^0.44.12",
     "ng2-charts": "~10.0.0",
-    "postcss": "^8.5.15",
+    "postcss": "^8.5.19",
     "rxjs": "~7.8.0",
     "sweetalert2": "~11.10.0",
     "tailwindcss": "^4.3.0",
     "tslib": "^2.6.0"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "~21.2.0",
+    "@angular-devkit/build-angular": "~22.1.2",
     "@angular-eslint/builder": "~21.0.0",
     "@angular-eslint/eslint-plugin": "~21.0.0",
     "@angular-eslint/eslint-plugin-template": "~21.0.0",
